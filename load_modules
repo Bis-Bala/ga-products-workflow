@@ -1,0 +1,1 @@
+module unload python/3.7.3;module load numpy;module load rasterio;module load eo-tools/0.4rc;module load luigi-mpi;module load psycopg2
