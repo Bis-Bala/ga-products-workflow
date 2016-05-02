@@ -135,7 +135,10 @@ class TidalWaveCellTask(CellTask):
                     if height in fl:
                         band = dataset.GetRasterBand(1)
                         ndwi = band.ReadAsArray(0,0, dataset.RasterXSize, dataset.RasterYSize)
-                        _log.info("shape of ndwi [%s] and data %s" ,  ndwi.shape, ndwi)
+                        mask_nan = numpy.ma.masked_invalid(ndwi)
+                        fill = 0
+                        mask_nan= numpy.ma.filled(mask_nan, fill)
+                        _log.info("shape of ndwi [%s] and data after nan masked %s" ,  mask_nan.shape, mask_nan)
                         band=dataset.GetRasterBand(5)
                         data=band.ReadAsArray(0,0, dataset.RasterXSize, dataset.RasterYSize)
                         av=data.mean().astype(int)                 
@@ -143,10 +146,10 @@ class TidalWaveCellTask(CellTask):
                         if fl.find("tide_100") > 0:
                             if height.find("tide_100") != -1:
                                 height_offset[heights[len(heights)-1]]+=av
-                                newimage+=numpy.where(ndwi>0, 0, 1)
+                                newimage+=numpy.where(mask_nan >= 0, 0, 1)
                         else:
                             height_offset[height]+=av
-                            newimage+=numpy.where(ndwi>0, 0, 1)
+                            newimage+=numpy.where(mask_nan >= 0, 0, 1)
                         _log.info("height_offset for %s is  %s avrg %d" , height, height_offset[height] ,av)
 
        

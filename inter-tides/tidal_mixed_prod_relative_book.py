@@ -138,12 +138,16 @@ class TidalWaveCellTask(CellTask):
                         #get the first ndwi band from the source file 
                         band = dataset.GetRasterBand(1)
                         ndwi = band.ReadAsArray(0,0, dataset.RasterXSize, dataset.RasterYSize)
+                        mask_nan = numpy.ma.masked_invalid(ndwi)
+                        fill = 0
+                        mask_nan= numpy.ma.filled(mask_nan, fill)
+                        _log.info("shape of ndwi [%s] and data after nan masked %s" ,  mask_nan.shape, mask_nan)
                         #ndwi>0 means water (0) else land(1)
                         if fl.find("tide_100") > 0:
                             if height.find("tide_100") != -1:
-                                newimage+=numpy.where(ndwi>0, 0,1)
+                                newimage+=numpy.where(mask_nan >= 0, 0,1)
                         else:
-                            newimage+=numpy.where(ndwi>0, 0, 1)
+                            newimage+=numpy.where(mask_nan >= 0, 0, 1)
                          
                         _log.info("shape of newimage [%s] and data %s" ,  newimage.shape, newimage)
        
